@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulir Dokumentasi Penanaman Bibit</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-dark: #1a5c2e;
+    --green-mid: #2e8b50;
+    --green-light: #4caf73;
+    --green-pale: #e8f5ed;
+    --green-ultra: #f0faf4;
+    --orange-dark: #b84000;
+    --orange-mid: #e85d04;
+    --orange-light: #f48c06;
+    --orange-pale: #fff3e0;
+    --white: #ffffff;
+    --off-white: #fafaf8;
+    --gray-100: #f4f4f2;
+    --gray-200: #e8e8e4;
+    --gray-400: #9e9e98;
+    --gray-600: #5a5a54;
+    --gray-800: #2a2a26;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.08);
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--off-white);
+    color: var(--gray-800);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .page-header {
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 60%, var(--green-light) 100%);
+    padding: 36px 24px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+  .page-header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 30%;
+    width: 280px; height: 140px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .header-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.95);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+  .header-badge svg { width: 14px; height: 14px; }
+  .page-header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+  .page-header p {
+    color: rgba(255,255,255,0.82);
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 560px;
+  }
+  .orange-accent {
+    display: inline-block;
+    width: 48px; height: 4px;
+    background: linear-gradient(90deg, var(--orange-light), var(--orange-mid));
+    border-radius: 2px;
+    margin-bottom: 16px;
+  }
+
+  /* MAIN CONTENT */
+  .main {
+    max-width: 760px;
+    margin: -24px auto 0;
+    padding: 0 16px 48px;
+  }
+
+  /* FORM CARD */
+  .form-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  /* SECTION */
+  .form-section {
+    padding: 28px 32px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .form-section:last-of-type { border-bottom: none; }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--green-dark);
+    margin-bottom: 20px;
+  }
+  .section-title .dot {
+    width: 8px; height: 8px;
+    background: var(--orange-mid);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    background: var(--green-dark);
+    color: white;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* FORM FIELDS */
+  .field-group { margin-bottom: 20px; }
+  .field-group:last-child { margin-bottom: 0; }
+  .field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 6px;
+  }
+  .field-label span.req {
+    color: var(--orange-mid);
+    margin-left: 2px;
+  }
+  .hint {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-top: 5px;
+    line-height: 1.5;
+  }
+  .hint strong { color: var(--gray-600); }
+  input[type="text"], input[type="date"], input[type="number"], textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    color: var(--gray-800);
+    background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  input[type="text"]:focus, input[type="date"]:focus,
+  input[type="number"]:focus, textarea:focus {
+    border-color: var(--green-mid);
+    box-shadow: 0 0 0 3px rgba(46,139,80,0.12);
+  }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+  .coord-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 480px) { .coord-row { grid-template-columns: 1fr; } }
+
+  /* UPLOAD AREA */
+  .upload-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 480px) { .upload-grid { grid-template-columns: 1fr 1fr; } }
+
+  .upload-box {
+    border: 2px dashed var(--gray-200);
+    border-radius: var(--radius);
+    padding: 16px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--gray-100);
+    position: relative;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .upload-box:hover { border-color: var(--green-mid); background: var(--green-ultra); }
+  .upload-box.has-file {
+    border-color: var(--green-light);
+    background: var(--green-ultra);
+  }
+  .upload-box input[type="file"] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+    padding: 0; border: none;
+  }
+  .upload-icon {
+    width: 32px; height: 32px;
+    color: var(--gray-400);
+  }
+  .upload-box.has-file .upload-icon { color: var(--green-mid); }
+  .upload-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-600);
+  }
+  .upload-box.has-file .upload-label { color: var(--green-dark); }
+  .upload-sub {
+    font-size: 10px;
+    color: var(--gray-400);
+    line-height: 1.4;
+  }
+  .upload-preview {
+    width: 100%;
+    max-height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    display: none;
+  }
+  .upload-box.has-file .upload-preview { display: block; }
+  .upload-box.has-file .upload-icon,
+  .upload-box.has-file .upload-label,
+  .upload-box.has-file .upload-sub { display: none; }
+  .upload-filename {
+    font-size: 10px;
+    color: var(--green-dark);
+    font-weight: 600;
+    display: none;
+    word-break: break-all;
+    padding: 0 4px;
+    text-align: center;
+  }
+  .upload-box.has-file .upload-filename { display: block; }
+
+  .upload-note {
+    font-size: 11.5px;
+    color: var(--gray-600);
+    background: var(--orange-pale);
+    border: 1px solid rgba(232,93,4,0.18);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+  .upload-note strong { color: var(--orange-dark); }
+
+  /* ACTION BUTTONS */
+  .action-bar {
+    padding: 24px 32px;
+    background: var(--green-ultra);
+    border-top: 1px solid var(--gray-100);
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border-radius: var(--radius);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+    color: white;
+    box-shadow: 0 4px 12px rgba(30,92,46,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(30,92,46,0.4); }
+  .btn-orange {
+    background: linear-gradient(135deg, var(--orange-dark), var(--orange-mid));
+    color: white;
+    box-shadow: 0 4px 12px rgba(184,64,0,0.30);
+  }
+  .btn-orange:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(184,64,0,0.4); }
+  .btn-ghost {
+    background: white;
+    color: var(--gray-600);
+    border: 1.5px solid var(--gray-200);
+  }
+  .btn-ghost:hover { background: var(--gray-100); }
+  .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* STATUS MESSAGES */
+  .status-msg {
+    margin: 0 32px 20px;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    display: none;
+  }
+  .status-msg.success {
+    background: var(--green-pale);
+    color: var(--green-dark);
+    border: 1px solid var(--green-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .status-msg.error {
+    background: #fff0f0;
+    color: #b00000;
+    border: 1px solid #ffb3b3;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* FOOTER */
+  .page-footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: var(--gray-400);
+  }
+
+  /* PRINT / PDF HIDDEN */
+  .pdf-only { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
+      Program Penghijauan
+    </div>
+    <div class="orange-accent"></div>
+    <h1>Formulir Dokumentasi<br>Penanaman Bibit</h1>
+    <p>Lengkapi semua kolom isian di bawah ini untuk mendokumentasikan kegiatan penanaman bibit. Data akan disimpan dalam format spreadsheet dan laporan PDF resmi.</p>
+  </div>
+</div>
+
+<div class="main">
+  <div class="form-card" id="mainForm">
+
+    <!-- STATUS -->
+    <div class="status-msg" id="statusMsg"></div>
+
+    <!-- SECTION 1: IDENTITAS -->
+    <div class="form-section">
+      <div class="section-title">
+        <span class="section-num">1</span>
+        Identitas Penerima Bibit
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="namaInstansi">
+          Nama Instansi / Lembaga / Komunitas Penerima Bibit <span class="req">*</span>
+        </label>
+        <input type="text" id="namaInstansi" placeholder="Contoh: Komunitas Hijau Temanggung / SMAN 1 Temanggung" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="tanggalPenanaman">
+          Tanggal Penanaman <span class="req">*</span>
+        </label>
+        <input type="date" id="tanggalPenanaman" />
+      </div>
+    </div>
+
+    <!-- SECTION 2: LOKASI -->
+    <div class="form-section">
+      <div class="section-title">
+        <span class="section-num">2</span>
+        Lokasi Penanaman
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="lokasiPenanaman">
+          Lokasi Penanaman Bibit <span class="req">*</span>
+        </label>
+        <textarea id="lokasiPenanaman" rows="3" placeholder="Tulis lokasi lengkap sesuai petunjuk di bawah..."></textarea>
+        <div class="hint">
+          <strong>Petunjuk pengisian:</strong><br>
+          a. Area Persawahan, RT XX RW XX Desa XX, Kecamatan XX; atau<br>
+          b. Halaman SMAN XX Temanggung
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: KOORDINAT -->
+    <div class="form-section">
+      <div class="section-title">
+        <span class="section-num">3</span>
+        Koordinat Penanaman
+      </div>
+
+      <div class="coord-row">
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label" for="latitude">Latitude / Y</label>
+          <input type="number" id="latitude" step="0.00001" placeholder="-7.31467" />
+          <div class="hint">Contoh: <strong>-7.31467</strong></div>
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label class="field-label" for="longitude">Longitude / X</label>
+          <input type="number" id="longitude" step="0.00001" placeholder="110.31467" />
+          <div class="hint">Contoh: <strong>110.31467</strong></div>
+        </div>
+      </div>
+      <div class="hint" style="margin-top: 12px; padding: 10px 14px; background: var(--orange-pale); border-radius: 8px; border: 1px solid rgba(232,93,4,0.18);">
+        ⚠️ Jika tidak dapat mengisi koordinat, mohon foto yang diupload dilengkapi dengan <strong>tagging lokasi</strong>.
+      </div>
+    </div>
+
+    <!-- SECTION 4: DOKUMENTASI -->
+    <div class="form-section">
+      <div class="section-title">
+        <span class="section-num">4</span>
+        Dokumentasi Foto
+      </div>
+
+      <div class="upload-grid">
+        <!-- Foto 1 -->
+        <div class="upload-box" id="box1">
+          <input type="file" accept="image/jpeg,image/png" id="foto1" onchange="handleUpload(this, 'box1', 'prev1', 'fname1')" />
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          <span class="upload-label">Foto 1</span>
+          <span class="upload-sub">Landscape · JPG/PNG<br>Maks. 10 MB</span>
+          <img class="upload-preview" id="prev1" />
+          <span class="upload-filename" id="fname1"></span>
+        </div>
+        <!-- Foto 2 -->
+        <div class="upload-box" id="box2">
+          <input type="file" accept="image/jpeg,image/png" id="foto2" onchange="handleUpload(this, 'box2', 'prev2', 'fname2')" />
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          <span class="upload-label">Foto 2</span>
+          <span class="upload-sub">Landscape · JPG/PNG<br>Maks. 10 MB</span>
+          <img class="upload-preview" id="prev2" />
+          <span class="upload-filename" id="fname2"></span>
+        </div>
+        <!-- Foto 3 -->
+        <div class="upload-box" id="box3">
+          <input type="file" accept="image/jpeg,image/png" id="foto3" onchange="handleUpload(this, 'box3', 'prev3', 'fname3')" />
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          <span class="upload-label">Foto 3</span>
+          <span class="upload-sub">Landscape · JPG/PNG<br>Maks. 10 MB</span>
+          <img class="upload-preview" id="prev3" />
+          <span class="upload-filename" id="fname3"></span>
+        </div>
+      </div>
+
+      <div class="upload-note">
+        <strong>Ketentuan Foto:</strong> Posisi landscape · Format JPG atau PNG · Dilengkapi tagging lokasi · Ukuran maksimal <strong>10 MB</strong> per foto
+      </div>
+    </div>
+
+    <!-- ACTION BAR -->
+    <div class="action-bar">
+      <button class="btn btn-orange" onclick="generatePDF()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+        Unduh Laporan PDF
+      </button>
+      <button class="btn btn-primary" onclick="downloadCSV()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Unduh Spreadsheet (CSV)
+      </button>
+      <button class="btn btn-ghost" onclick="resetForm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+        Reset
+      </button>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    Formulir Dokumentasi Penanaman Bibit · Data disimpan lokal di perangkat Anda
+  </div>
+</div>
+
+<script>
+  // ---- UPLOAD HANDLING ----
+  const photoData = { foto1: null, foto2: null, foto3: null };
+
+  function handleUpload(input, boxId, prevId, fnameId) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      showStatus('error', 'Ukuran file melebihi 10 MB. Silakan pilih file yang lebih kecil.');
+      input.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+      const key = input.id;
+      photoData[key] = { dataUrl, name: file.name };
+      document.getElementById(prevId).src = dataUrl;
+      document.getElementById(fnameId).textContent = file.name;
+      document.getElementById(boxId).classList.add('has-file');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ---- VALIDATION ----
+  function getFormData() {
+    return {
+      namaInstansi: document.getElementById('namaInstansi').value.trim(),
+      tanggalPenanaman: document.getElementById('tanggalPenanaman').value,
+      lokasiPenanaman: document.getElementById('lokasiPenanaman').value.trim(),
+      latitude: document.getElementById('latitude').value.trim(),
+      longitude: document.getElementById('longitude').value.trim(),
+    };
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const [y, m, d] = dateStr.split('-');
+    const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    return `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
+  }
+
+  function validate(data) {
+    if (!data.namaInstansi) return 'Nama instansi/lembaga/komunitas wajib diisi.';
+    if (!data.tanggalPenanaman) return 'Tanggal penanaman wajib diisi.';
+    if (!data.lokasiPenanaman) return 'Lokasi penanaman wajib diisi.';
+    return null;
+  }
+
+  function showStatus(type, msg) {
+    const el = document.getElementById('statusMsg');
+    el.className = 'status-msg ' + type;
+    el.innerHTML = (type === 'success' ? '✅ ' : '❌ ') + msg;
+    el.style.display = 'flex';
+    setTimeout(() => { el.style.display = 'none'; }, 4000);
+  }
+
+  // ---- CSV DOWNLOAD ----
+  function downloadCSV() {
+    const d = getFormData();
+    const err = validate(d);
+    if (err) { showStatus('error', err); return; }
+
+    const headers = [
+      'Nama Instansi/Lembaga/Komunitas',
+      'Tanggal Penanaman',
+      'Lokasi Penanaman',
+      'Latitude (Y)',
+      'Longitude (X)',
+      'Foto 1',
+      'Foto 2',
+      'Foto 3'
+    ];
+    const row = [
+      `"${d.namaInstansi}"`,
+      `"${formatDate(d.tanggalPenanaman)}"`,
+      `"${d.lokasiPenanaman.replace(/"/g, '""')}"`,
+      d.latitude || '-',
+      d.longitude || '-',
+      photoData.foto1 ? `"${photoData.foto1.name}"` : '-',
+      photoData.foto2 ? `"${photoData.foto2.name}"` : '-',
+      photoData.foto3 ? `"${photoData.foto3.name}"` : '-',
+    ];
+
+    const csvContent = '\uFEFF' + headers.join(';') + '\n' + row.join(';');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const safeName = d.namaInstansi.replace(/[^a-z0-9]/gi, '_').substring(0, 30);
+    a.download = `data-penanaman_${safeName}_${d.tanggalPenanaman}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showStatus('success', 'Spreadsheet CSV berhasil diunduh!');
+  }
+
+  // ---- PDF GENERATION ----
+  function generatePDF() {
+    const d = getFormData();
+    const err = validate(d);
+    if (err) { showStatus('error', err); return; }
+
+    if (typeof window.jspdf === 'undefined') {
+      showStatus('error', 'Library PDF belum siap. Tunggu sebentar lalu coba lagi.');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const W = 210; // A4 width mm
+    const greenDark = [26, 92, 46];
+    const greenMid = [46, 139, 80];
+    const greenLight = [76, 175, 115];
+    const greenPale = [232, 245, 237];
+    const orange = [232, 93, 4];
+    const orangePale = [255, 243, 224];
+    const white = [255, 255, 255];
+    const grayDark = [42, 42, 38];
+    const grayMid = [90, 90, 84];
+    const grayLight = [228, 228, 228];
+
+    // ---- HEADER BLOCK ----
+    doc.setFillColor(...greenDark);
+    doc.rect(0, 0, W, 52, 'F');
+
+    // Orange accent bar
+    doc.setFillColor(...orange);
+    doc.rect(0, 52, W, 4, 'F');
+
+    // Decorative circle
+    doc.setFillColor(255, 255, 255, 0.05);
+    doc.setDrawColor(255,255,255);
+    doc.setLineWidth(0.1);
+    doc.circle(185, 10, 28, 'S');
+    doc.circle(185, 10, 20, 'S');
+
+    // Logo / icon area
+    doc.setFillColor(255,255,255,0.15);
+    doc.roundedRect(14, 10, 32, 32, 4, 4, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(24);
+    doc.text('🌱', 18, 31);
+
+    // Header text
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(200, 230, 210);
+    doc.text('LAPORAN DOKUMENTASI', 52, 16);
+
+    doc.setFontSize(18);
+    doc.setFont('helvetica','bold');
+    doc.setTextColor(255,255,255);
+    doc.text('PENANAMAN BIBIT', 52, 27);
+
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(200, 230, 210);
+    doc.text('Program Penghijauan & Pelestarian Lingkungan', 52, 35);
+
+    // Date on right
+    doc.setFontSize(7.5);
+    doc.setTextColor(200,230,210);
+    doc.text('Tanggal Cetak:', W - 14, 16, { align: 'right' });
+    doc.setFont('helvetica','bold');
+    doc.setTextColor(255,255,255);
+    doc.text(formatDate(new Date().toISOString().split('T')[0]), W - 14, 23, { align: 'right' });
+
+    // ---- SECTION HELPER ----
+    let y = 64;
+    const margin = 14;
+    const contentW = W - 2 * margin;
+
+    function sectionHeader(title, icon) {
+      doc.setFillColor(...greenPale);
+      doc.roundedRect(margin, y, contentW, 9, 2, 2, 'F');
+      doc.setFillColor(...greenMid);
+      doc.roundedRect(margin, y, 3, 9, 1, 1, 'F');
+      doc.setFontSize(8);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(...greenDark);
+      doc.text(title, margin + 7, y + 6);
+      y += 13;
+    }
+
+    function dataRow(label, value, isLast) {
+      const rowH = 8;
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(...grayMid);
+      doc.text(label, margin + 3, y + 5);
+
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(...grayDark);
+      const lines = doc.splitTextToSize(value || '-', contentW - 55);
+      doc.text(lines, margin + 55, y + 5);
+      y += Math.max(rowH, lines.length * 5);
+
+      if (!isLast) {
+        doc.setDrawColor(...grayLight);
+        doc.setLineWidth(0.2);
+        doc.line(margin + 3, y, margin + contentW - 3, y);
+      }
+    }
+
+    // ---- SECTION 1: IDENTITAS ----
+    sectionHeader('1.  IDENTITAS PENERIMA BIBIT');
+    dataRow('Nama Instansi / Lembaga / Komunitas', d.namaInstansi, false);
+    dataRow('Tanggal Penanaman', formatDate(d.tanggalPenanaman), true);
+    y += 6;
+
+    // ---- SECTION 2: LOKASI ----
+    sectionHeader('2.  LOKASI PENANAMAN');
+    dataRow('Lokasi Penanaman', d.lokasiPenanaman, false);
+    dataRow('Koordinat Latitude (Y)', d.latitude || '(Tidak diisi — lihat tagging lokasi pada foto)', false);
+    dataRow('Koordinat Longitude (X)', d.longitude || '(Tidak diisi — lihat tagging lokasi pada foto)', true);
+    y += 6;
+
+    // ---- SECTION 3: FOTO ----
+    sectionHeader('3.  DOKUMENTASI FOTO');
+
+    const photos = [
+      photoData.foto1,
+      photoData.foto2,
+      photoData.foto3
+    ].filter(Boolean);
+
+    if (photos.length === 0) {
+      doc.setFontSize(8);
+      doc.setFont('helvetica','italic');
+      doc.setTextColor(...grayMid);
+      doc.text('Tidak ada foto yang diupload.', margin + 4, y + 5);
+      y += 12;
+    } else {
+      // Lay out photos in grid
+      const photoW = (contentW - 8) / 3;
+      const photoH = photoW * 0.65;
+      let px = margin;
+      photos.forEach((photo, i) => {
+        try {
+          const ext = photo.name.toLowerCase().endsWith('.png') ? 'PNG' : 'JPEG';
+          // Photo frame
+          doc.setFillColor(248,248,246);
+          doc.setDrawColor(...grayLight);
+          doc.setLineWidth(0.3);
+          doc.roundedRect(px, y, photoW, photoH + 10, 2, 2, 'FD');
+          // Image
+          doc.addImage(photo.dataUrl, ext, px + 1, y + 1, photoW - 2, photoH - 2, '', 'FAST');
+          // Caption
+          doc.setFontSize(6.5);
+          doc.setFont('helvetica','bold');
+          doc.setTextColor(...greenDark);
+          doc.text(`Foto ${i+1}`, px + photoW/2, y + photoH + 1.5, { align: 'center' });
+          const shortName = photo.name.length > 20 ? photo.name.substring(0,18)+'…' : photo.name;
+          doc.setFont('helvetica','normal');
+          doc.setTextColor(...grayMid);
+          doc.text(shortName, px + photoW/2, y + photoH + 7, { align: 'center' });
+        } catch(e) { /* skip if image fails */ }
+        px += photoW + 4;
+      });
+      y += photoH + 16;
+    }
+
+    y += 4;
+
+    // ---- FOOTER ----
+    const footerY = 282;
+    doc.setFillColor(...greenDark);
+    doc.rect(0, footerY, W, 15, 'F');
+    doc.setFillColor(...orange);
+    doc.rect(0, footerY, W, 2, 'F');
+
+    doc.setFontSize(7);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(200,230,210);
+    doc.text('Laporan ini dibuat secara otomatis dari Formulir Dokumentasi Penanaman Bibit', margin, footerY + 7);
+    doc.text(`Halaman 1/1`, W - margin, footerY + 7, { align: 'right' });
+    doc.setTextColor(255,255,255);
+    doc.text('Program Penghijauan · Data disimpan lokal di perangkat', margin, footerY + 12);
+
+    // ---- WATERMARK STAMP ----
+    doc.setFontSize(6);
+    doc.setTextColor(...grayLight);
+
+    // ---- SAVE ----
+    const safeName = d.namaInstansi.replace(/[^a-z0-9]/gi, '_').substring(0, 30);
+    doc.save(`laporan-penanaman_${safeName}_${d.tanggalPenanaman}.pdf`);
+    showStatus('success', 'Laporan PDF berhasil diunduh!');
+  }
+
+  // ---- RESET ----
+  function resetForm() {
+    if (!confirm('Reset semua isian? Data yang belum disimpan akan hilang.')) return;
+    document.getElementById('namaInstansi').value = '';
+    document.getElementById('tanggalPenanaman').value = '';
+    document.getElementById('lokasiPenanaman').value = '';
+    document.getElementById('latitude').value = '';
+    document.getElementById('longitude').value = '';
+    ['1','2','3'].forEach(n => {
+      document.getElementById('foto'+n).value = '';
+      document.getElementById('prev'+n).src = '';
+      document.getElementById('fname'+n).textContent = '';
+      document.getElementById('box'+n).classList.remove('has-file');
+      photoData['foto'+n] = null;
+    });
+    showStatus('success', 'Formulir berhasil direset.');
+  }
+</script>
+</body>
+</html>
